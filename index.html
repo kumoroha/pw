@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>太平洋戦争：戦局の分岐点と「IF」の考察</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        stone: {
+                            50: '#fafaf9',
+                            100: '#f5f5f4',
+                            200: '#e7e5e4',
+                            300: '#d6d3d1',
+                            700: '#44403c',
+                            800: '#292524',
+                            900: '#1c1917',
+                        },
+                        historical: '#7f1d1d', /* red-900 */
+                        alternative: '#312e81', /* indigo-900 */
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans JP"', 'sans-serif'],
+                        serif: ['"Noto Serif JP"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@400;700&display=swap');
+        
+        body {
+            background-color: #fafaf9; /* stone-50 */
+            color: #292524; /* stone-800 */
+        }
+        
+        /* Chart Container Requirements */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        /* Custom Scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="font-sans antialiased overflow-x-hidden">
+
+    <!-- Chosen Palette: Warm Neutrals (Stone) & Historical Accents (Dark Red & Indigo) -->
+    <!-- Application Structure Plan: 
+         1. Hero Section (Introduction)
+         2. Context: The Resource Gap (Chart showing why early decisive victory was needed)
+         3. Structural Flaws (Grid of organizational issues and their "IF" fixes)
+         4. Tactical Turning Points (Interactive Tabs and Toggles for specific battles)
+         5. Conclusion (Overall analysis)
+         This structure logically moves from the macro (context/structure) to the micro (specific battles), ending with a realistic synthesis.
+    -->
+    <!-- Visualization & Content Choices:
+         - Context/Resource Gap -> Bar Chart (Chart.js) -> Compare US/Japan capabilities -> To visually prove the necessity of short-term tactical victories.
+         - Structural Flaws -> Grid Layout with Hover/Click effects -> To present organizational issues clearly without clutter.
+         - Tactical Turning Points -> Tabbed Interface & Toggle Switch (Fact vs. IF) -> To allow user exploration of different battles and instantly see the cause-and-effect of alternate decisions.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-stone-100 border-b border-stone-300 shadow-sm opacity-95">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-2">
+                    <span class="text-2xl font-serif text-historical font-bold">⚓</span>
+                    <span class="font-serif font-bold text-xl tracking-wider">太平洋戦争：分岐点考察</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-6 text-sm font-medium">
+                    <a href="#context" class="hover:text-historical transition-colors">背景と国力差</a>
+                    <a href="#structure" class="hover:text-historical transition-colors">組織構造のIF</a>
+                    <a href="#battles" class="hover:text-historical transition-colors">戦術的転換点</a>
+                    <a href="#conclusion" class="hover:text-historical transition-colors">総括</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-stone-800 text-stone-50 py-20 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-serif font-bold mb-6 leading-tight">敗戦は不可避だったのか？<br><span class="text-stone-400 text-3xl md:text-4xl">日本軍が勝機を掴み得た「分岐点」の探求</span></h1>
+            <p class="text-lg md:text-xl text-stone-300 mb-8 leading-relaxed text-left md:text-center">
+                圧倒的な国力差があったアメリカに対し、日本が「完全勝利（無条件降伏）」を収めることは不可能に近かったのが現実です。しかし、「有利な条件での早期講和」を引き出すための戦術的勝利を重ねるチャンスは幾度か存在しました。<br>
+                本レポートでは、組織構造の欠陥と具体的な戦闘指揮の「IF（もしも）」を検証し、戦局がどう変わり得たかを詳細に分析します。
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-24">
+
+        <!-- Section 1: Context (Data) -->
+        <section id="context" class="scroll-mt-24">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-serif font-bold text-stone-800 mb-4 border-b-2 border-stone-300 inline-block pb-2">大前提：絶望的な国力差と「短期決戦」の必然性</h2>
+                <p class="text-stone-600 max-w-3xl mx-auto text-left md:text-center mt-4">
+                    以下のグラフが示すように、開戦時の日米の工業力・資源量には圧倒的な差がありました。長期戦になれば確実に敗北するため、日本軍は「初期の段階で決定的な打撃を与え、アメリカの戦意を喪失させて講和に持ち込む」ことしか勝機はありませんでした。だからこそ、一つ一つの戦術的ミスが致命傷となったのです。
+                </p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-stone-200">
+                    <h3 class="text-xl font-bold mb-4 text-center">日米の国力比較 (開戦時比率)</h3>
+                    <div class="chart-container">
+                        <canvas id="powerChart"></canvas>
+                    </div>
+                    <p class="text-xs text-stone-500 text-center mt-2">※概算比率（日本を1とした場合のアメリカの倍率）</p>
+                </div>
+                <div class="space-y-6">
+                    <div class="bg-stone-100 p-6 rounded-l border-l-4 border-historical">
+                        <h4 class="font-bold text-lg mb-2">工業力の差が意味するもの</h4>
+                        <p class="text-stone-700 text-sm leading-relaxed">
+                            鉄鋼や石油の生産量の差は、そのまま「兵器の補充能力」の差に直結します。日本は一度空母や熟練搭乗員を失うと再建に数年を要しますが、アメリカは数ヶ月でそれを上回る数を戦線に投入できました。
+                        </p>
+                    </div>
+                    <div class="bg-stone-100 p-6 rounded-l border-l-4 border-alternative">
+                        <h4 class="font-bold text-lg mb-2">求められた「完璧な采配」</h4>
+                        <p class="text-stone-700 text-sm leading-relaxed">
+                            この圧倒的劣勢を覆すためには、日本軍は情報の優位性を保ち、兵力を集中させ、指揮官が一切の躊躇なく最適解を選び続ける「奇跡の連鎖」が必要でした。以後のセクションでは、その連鎖が途切れた場面を検証します。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Structural Flaws -->
+        <section id="structure" class="scroll-mt-24">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-serif font-bold text-stone-800 mb-4 border-b-2 border-stone-300 inline-block pb-2">根深い病理：日本軍の腐敗した組織構造をどう治すべきだったか</h2>
+                <p class="text-stone-600 max-w-4xl mx-auto text-left mt-4">
+                    戦場での采配以前に、日本軍（特に大本営）は組織として致命的な欠陥を抱えていました。これらの「構造的問題」が改善されていれば、戦局は大きく異なっていたはずです。カードをクリックして「史実の構造」と「あるべき改善策（IF）」を確認してください。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="structure-grid">
+                <!-- Populated by JS -->
+            </div>
+        </section>
+
+        <!-- Section 3: Tactical Turning Points -->
+        <section id="battles" class="scroll-mt-24 bg-stone-100 rounded-xl p-6 md:p-10 shadow-inner">
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-serif font-bold text-stone-800 mb-4 border-b-2 border-stone-300 inline-block pb-2">戦場での分岐点：「もし」あの時、別の決断を下していたら</h2>
+                <p class="text-stone-600 max-w-4xl mx-auto text-left mt-4 mb-8">
+                    ここからは具体的な海戦・陸戦に焦点を当てます。指揮官の逡巡、情報分析の誤り、教条主義への固執が敗北を招いた場面を抽出し、「どう叩いていれば（どう判断していれば）勝機があったか」をシミュレーションします。
+                </p>
+
+                <!-- Battle Navigation Tabs -->
+                <div class="flex flex-wrap justify-center gap-2 mb-8" id="battle-tabs">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Interactive Battle Content Area -->
+            <div class="bg-white rounded-lg shadow-md border border-stone-200 overflow-hidden">
+                <div class="p-6 md:p-8" id="battle-content">
+                    <!-- Content injected by JS -->
+                </div>
+                
+                <!-- Toggle Interface -->
+                <div class="bg-stone-50 border-t border-stone-200 p-6 flex flex-col items-center justify-center">
+                    <p class="text-sm font-bold text-stone-500 mb-4 uppercase tracking-widest">歴史の分岐点を選択</p>
+                    <div class="flex items-center space-x-4 bg-stone-200 p-1 rounded-full relative">
+                        <div id="toggle-bg" class="absolute bg-white w-1/2 h-5/6 rounded-full shadow transition-transform duration-300 transform translate-x-0"></div>
+                        <button id="btn-historical" class="relative z-10 px-8 py-2 font-bold text-historical rounded-full transition-colors w-40 text-center">史実 (Fact)</button>
+                        <button id="btn-alternative" class="relative z-10 px-8 py-2 font-bold text-stone-500 rounded-full transition-colors w-40 text-center">IF (分岐後)</button>
+                    </div>
+                </div>
+
+                <!-- Result Details Area -->
+                <div id="scenario-details" class="p-6 md:p-8 bg-stone-800 text-stone-100 min-h-[250px] transition-colors duration-500">
+                     <!-- Injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Conclusion -->
+        <section id="conclusion" class="scroll-mt-24 mb-20">
+            <div class="bg-stone-200 p-8 md:p-12 rounded-xl border border-stone-300 relative overflow-hidden">
+                <!-- Decorative element -->
+                <div class="absolute top-0 right-0 text-9xl text-stone-300 opacity-20 font-serif leading-none transform translate-x-4 -translate-y-4">終</div>
+                
+                <h2 class="text-3xl font-serif font-bold text-stone-800 mb-6 relative z-10">総括：勝利の「可能性」はどこにあったのか</h2>
+                
+                <div class="space-y-6 text-stone-800 relative z-10">
+                    <p class="leading-relaxed">
+                        これまで見てきた通り、日本軍の敗因の多くは「圧倒的な物量差」以前に、<strong>「硬直化した組織構造」「情報の軽視」「論理より精神論を優先する風土」</strong>という自滅的な要因にありました。
+                    </p>
+                    <p class="leading-relaxed">
+                        もし、ミッドウェーで山口多聞の進言が採用され米空母を壊滅させていたら。もし、ガダルカナルで初期から大兵力を投入し補給を確立していたら。もし、レイテで栗田艦隊が突入を完遂していたら。それぞれの戦場で局地的な「大勝利」を収める可能性は確かに存在しました。
+                    </p>
+                    <div class="bg-white p-6 rounded border-l-4 border-historical my-6 shadow-sm">
+                        <h3 class="font-bold text-xl mb-3 text-historical">究極のIF：それでも「最終的勝利」は得られたか？</h3>
+                        <p class="text-sm leading-relaxed text-stone-700">
+                            結論から言えば、アメリカ合衆国を屈服させ、ワシントンD.C.を占領するような完全勝利は<strong>「100%不可能」</strong>でした。アメリカの驚異的な工業生産力（特にエセックス級空母の量産態勢や原爆開発）を止める手立ては日本にはありませんでした。<br><br>
+                            しかし、これらの「IF」が重なり、米軍に史実以上の甚大な出血を強いることができていれば、<strong>アメリカ国内で厭戦気分が高まり、「無条件降伏」ではなく、「ある程度日本の権益（例えば満州の保持など）を認めた上での早期講和」が成立した可能性</strong>は残されていました。日本軍が目指すべきだった唯一の「勝利」とは、敵を殲滅することではなく、敵に「これ以上戦争を続けるのは割に合わない」と思わせる外交的・戦略的なダメージコントロールだったのです。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-stone-900 text-stone-400 py-8 text-center text-sm">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>※本ページの内容は歴史的資料に基づいた戦術的シミュレーション（IF考察）であり、特定の思想や戦争を賛美・肯定するものではありません。</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Data Storage ---
+
+        // Chart Data
+        const powerData = {
+            labels: ['国民総生産(GDP)', '鉄鋼生産量', '石炭生産量', '自動車生産量', '航空機生産数(大戦中累計)'],
+            datasets: [{
+                label: 'アメリカの国力 (日本を1とした場合)',
+                data: [12, 20, 10, 450, 4.5], // Approximate historical ratios
+                backgroundColor: 'rgba(49, 46, 129, 0.7)', // indigo-900
+                borderColor: 'rgba(49, 46, 129, 1)',
+                borderWidth: 1
+            }]
+        };
+
+        // Structural Flaws Data
+        const structuralFlaws = [
+            {
+                title: "陸海軍の深刻な対立とセクショナリズム",
+                fact: "陸軍と海軍は別々の統帥権を持ち、作戦目標や資源（鉄鋼、石油）を巡って激しく対立。情報の共有もされず、同じ地域で別々の作戦を展開することもあった。",
+                ifFix: "【改善策】強力な「統合幕僚組織」の創設。国家戦略を一本化し、限られた資源や輸送船腹を合理的に分配。作戦の重複を避け、陸海軍の共同作戦（例：航空支援と上陸部隊の連携）を緻密に実行する。"
+            },
+            {
+                title: "兵站（ロジスティクス）の軽視",
+                fact: "「戦線拡大」を優先し、補給線を維持する計画がずさん。「現地調達」という名目の略奪に頼り、ガダルカナルやインパールでは戦闘より餓死・病死による犠牲が上回った。",
+                ifFix: "【改善策】兵站計画を作戦の絶対条件とする。輸送船の護衛（護衛艦隊・対潜哨戒）を最優先課題とし、補給線が維持できない作戦は決して認可しない。結果として兵士の生存率と継戦能力が劇的に向上する。"
+            },
+            {
+                title: "情報戦・暗号防衛の軽視",
+                fact: "「日本軍の暗号は解読されない」という根拠なき自信。米軍の通信解析やレーダー技術の進歩を過小評価し、自軍の行動は常に筒抜け状態だった。",
+                ifFix: "【改善策】情報将校の権限強化と科学技術への投資。暗号体系の頻繁な更新、米軍の通信傍受体制の構築。客観的データに基づき、敵の待ち伏せ（ミッドウェー等）を事前に察知し回避・逆襲する。"
+            },
+            {
+                title: "信賞必罰の欠如と無責任体制",
+                fact: "作戦に失敗した指揮官（辻政信など）が責任を問われず、別の戦線で再び無謀な作戦を立案・実行する。失敗から学ぶ組織的フィードバック機能が欠如していた。",
+                ifFix: "【改善策】客観的評価に基づく厳格な人事。失敗の要因を論理的に分析（戦訓の抽出）し、精神論ではなく戦術の改善に繋げる。無能な指揮官は即座に更迭し、実力ある現場の声を吸い上げる風土を作る。"
+            }
+        ];
+
+        // Tactical Battles Data
+        const battles = [
+            {
+                id: "pearl",
+                name: "真珠湾攻撃",
+                icon: "✈️",
+                summary: "1941年12月。機動部隊によるハワイ真珠湾への奇襲攻撃。米太平洋艦隊の戦艦群を撃沈・大破させ、大戦果を挙げた。",
+                divergence: "攻撃目標の選定と「第三次攻撃」の実施可否",
+                fact: {
+                    title: "戦艦への攻撃に固執し、早期撤退",
+                    desc: "南雲忠一中将率いる機動部隊は、第一次・第二次攻撃で米戦艦群に致命傷を与えた後、無傷であった米空母の反撃を恐れ、工廠（修理施設）や巨大な重油タンクを手付かずのまま帰投した。",
+                    impact: "米軍は沈んだ戦艦を即座に引き揚げて修理（工廠が無事だったため）し、重油タンクが無事だったためハワイを前進基地としてすぐに機能させ、反攻のスピードを早めた。"
+                },
+                alternative: {
+                    title: "第三次攻撃隊を発進させ、インフラを徹底破壊",
+                    desc: "当初の計画通り、または現場の進言（山口多聞ら）を容れ、第三次攻撃隊を発進。目標をドック（修理工廠）や燃料タンク群に絞り、これを徹底的に破壊・炎上させる。",
+                    impact: "ハワイの基地機能は完全に麻痺。米艦隊は米国西海岸（サンディエゴ等）まで後退せざるを得ず、太平洋における米軍の反攻開始は史実より半年から1年遅れた。日本はその間に南方資源地帯の防衛線を強固に構築できた。"
+                }
+            },
+            {
+                id: "midway",
+                name: "ミッドウェー海戦",
+                icon: "🚢",
+                summary: "1942年6月。日本の主力空母4隻を一挙に喪失し、太平洋戦争のターニングポイントとなった決定的な敗北。",
+                divergence: "索敵の不徹底と、南雲中将の「兵装転換」の迷い",
+                fact: {
+                    title: "索敵機（利根4号機）の遅れと、兵装転換の致命的ロスタイム",
+                    desc: "米空母の存在を想定していなかった南雲司令部は、索敵機からの「敵艦隊発見」の報告を受けパニックに。陸上攻撃用の爆弾から艦船攻撃用の魚雷へ兵装転換を命じたが、その最中に米急降下爆撃機の奇襲を受け、飛行甲板上の爆弾が誘爆。主力空母3隻が数分で炎上した。",
+                    impact: "赤城、加賀、蒼龍、飛龍の主力空母4隻と熟練搭乗員を多数喪失。日本の攻撃力は半減し、以後、攻守が完全に逆転した。"
+                },
+                alternative: {
+                    title: "山口多聞の進言「現装備のまま直ちに攻撃隊発進せしむるを至当と認む」の採用",
+                    desc: "敵発見の報を受けた際、第二航空戦隊司令官・山口多聞は、陸上用爆弾のままでも空母の飛行甲板を破壊すれば発着艦不能にできると判断し、即時攻撃を進言。南雲中将がこれを採用し、準備ができた機体から直ちに米空母へ向かわせる。",
+                    impact: "先制攻撃に成功し、米空母（エンタープライズ、ホーネット、ヨークタウン）を撃破または無力化。日本側の損害は最小限に留まり、空母機動部隊は健在。ミッドウェー島を占領し、ハワイ攻略の足がかりとするか、有利な講和への強力なカードを手に入れた。"
+                }
+            },
+            {
+                id: "guadalcanal",
+                name: "ガダルカナル島の戦い",
+                icon: "🌴",
+                summary: "1942年8月〜1943年2月。ソロモン諸島において日米が死闘を繰り広げた消耗戦。「餓島」と呼ばれる悲劇の舞台。",
+                divergence: "初期段階での戦力投入規模と、兵站（補給）への認識",
+                fact: {
+                    title: "兵力の「逐次投入」と補給無視の白兵突撃",
+                    desc: "米軍の兵力を過小評価。一木支隊（約900名）、川口支隊（約4000名）と少しずつ兵力を送り込み、圧倒的火力を持つ米軍陣地に無謀なバンザイ突撃を繰り返し全滅。制海・制空権を奪われ補給も途絶し、多くの将兵が餓死した。",
+                    impact: "半年間の消耗戦の末、大敗北を喫し撤退。陸軍の精鋭部隊と海軍の航空機・艦艇を無意味に消耗し、ソロモン方面の防衛線が崩壊した。"
+                },
+                alternative: {
+                    title: "初期から重火器を伴う大兵力を一挙投入し、補給線を死守",
+                    desc: "米軍上陸直後、これを一過性の威力偵察と軽視せず、ただちに第17軍の主力を重砲・戦車と共に一挙に上陸させる。同時に海軍は輸送船団の護衛に全力を注ぎ、艦砲射撃で米軍のヘンダーソン飛行場を徹底破壊する。",
+                    impact: "米海兵隊が陣地を固める前に飛行場を奪還。ガダルカナルを不沈空母としてソロモン海域の制空権・制海権を握る。オーストラリアとアメリカ間の交通線を遮断する作戦（米豪遮断作戦）が機能し、米軍の反攻ルートを大きく狂わせた。"
+                }
+            },
+            {
+                id: "leyte",
+                name: "レイテ沖海戦",
+                icon: "🌊",
+                summary: "1944年10月。フィリピン奪還を目指す米軍に対し、日本海軍が事実上最後の大艦隊（連合艦隊）を投入した史上最大の海戦。",
+                divergence: "栗田艦隊の「謎の反転」",
+                fact: {
+                    title: "レイテ湾突入直前でのUターン（謎の反転）",
+                    desc: "数々の犠牲（囮となった小沢機動部隊、武蔵の沈没など）を払いながらも、栗田健男中将率いる主力艦隊（大和など）は米輸送船団が停泊するレイテ湾の目前まで迫った。しかし、突如として進路を北に変更（反転）し、突入を放棄して撤退してしまった。",
+                    impact: "日本海軍の組織的戦闘力は完全に消滅。マッカーサー率いる米軍の上陸を許し、フィリピンを喪失。これにより日本本土と南方資源地帯を繋ぐシーレーンが完全に遮断された。"
+                },
+                alternative: {
+                    title: "反転せず、レイテ湾へ突入を完遂",
+                    desc: "栗田長官が初志貫徹し、疲労や情報錯綜に惑わされることなくレイテ湾に突入。大和をはじめとする戦艦群の巨砲で、無防備な米軍の輸送船団、上陸用舟艇、物資集積所を徹底的に砲撃・破壊する。",
+                    impact: "レイテ島に上陸していた米陸軍は補給と退路を絶たれ孤立化し、甚大な被害を受ける。マッカーサーのメンツは丸潰れとなり、フィリピン奪還作戦は数ヶ月単位で頓挫。結果として日本本土への空襲開始や沖縄戦の時期を遅らせることに成功した。"
+                }
+            }
+        ];
+
+        // --- State Management ---
+        let currentBattleId = battles[0].id;
+        let isHistoricalMode = true;
+
+        // --- DOM Elements ---
+        const structureGrid = document.getElementById('structure-grid');
+        const battleTabs = document.getElementById('battle-tabs');
+        const battleContent = document.getElementById('battle-content');
+        const btnHistorical = document.getElementById('btn-historical');
+        const btnAlternative = document.getElementById('btn-alternative');
+        const toggleBg = document.getElementById('toggle-bg');
+        const scenarioDetails = document.getElementById('scenario-details');
+
+        // --- Initialization ---
+        function init() {
+            renderChart();
+            renderStructureGrid();
+            renderBattleTabs();
+            updateBattleView();
+
+            // Event Listeners for toggle
+            btnHistorical.addEventListener('click', () => setToggle(true));
+            btnAlternative.addEventListener('click', () => setToggle(false));
+        }
+
+        // --- Functions ---
+
+        function renderChart() {
+            const ctx = document.getElementById('powerChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: powerData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '倍率 (対日本)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.parsed.y + ' 倍';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderStructureGrid() {
+            structureGrid.innerHTML = '';
+            structuralFlaws.forEach(flaw => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-lg shadow border border-stone-200 overflow-hidden flex flex-col group cursor-pointer hover:shadow-lg transition-all duration-300";
+                card.innerHTML = `
+                    <div class="bg-stone-800 text-stone-100 p-4 font-bold border-b border-stone-700 relative">
+                        ${flaw.title}
+                        <span class="absolute right-4 top-4 text-xs font-normal text-stone-400 group-hover:text-white transition-colors">Tap to flip 🔄</span>
+                    </div>
+                    <div class="relative flex-grow h-48 perspective-1000">
+                        <!-- Fact Side -->
+                        <div class="absolute inset-0 p-5 bg-white text-stone-700 text-sm leading-relaxed transition-opacity duration-300 opacity-100 group-hover:opacity-0 flex items-center">
+                            <span class="font-bold text-historical mr-2">[史実]</span> ${flaw.fact}
+                        </div>
+                        <!-- IF Side -->
+                        <div class="absolute inset-0 p-5 bg-indigo-50 text-indigo-900 text-sm leading-relaxed transition-opacity duration-300 opacity-0 group-hover:opacity-100 flex items-center border-l-4 border-alternative">
+                            ${flaw.ifFix}
+                        </div>
+                    </div>
+                `;
+                structureGrid.appendChild(card);
+            });
+        }
+
+        function renderBattleTabs() {
+            battleTabs.innerHTML = '';
+            battles.forEach(battle => {
+                const btn = document.createElement('button');
+                btn.className = `px-4 py-2 rounded-full font-bold text-sm transition-all duration-300 border ${
+                    battle.id === currentBattleId 
+                    ? 'bg-stone-800 text-stone-50 border-stone-800 shadow-md' 
+                    : 'bg-white text-stone-600 border-stone-300 hover:bg-stone-200'
+                }`;
+                btn.innerHTML = `<span class="mr-1">${battle.icon}</span> ${battle.name}`;
+                btn.onclick = () => {
+                    currentBattleId = battle.id;
+                    isHistoricalMode = true; // Reset toggle on tab change
+                    renderBattleTabs(); // Update active state
+                    updateBattleView();
+                };
+                battleTabs.appendChild(btn);
+            });
+        }
+
+        function setToggle(isHistorical) {
+            isHistoricalMode = isHistorical;
+            if (isHistorical) {
+                toggleBg.classList.remove('translate-x-full');
+                toggleBg.classList.add('translate-x-0');
+                btnHistorical.classList.add('text-historical');
+                btnHistorical.classList.remove('text-stone-500');
+                btnAlternative.classList.add('text-stone-500');
+                btnAlternative.classList.remove('text-alternative');
+            } else {
+                toggleBg.classList.remove('translate-x-0');
+                toggleBg.classList.add('translate-x-full');
+                btnHistorical.classList.remove('text-historical');
+                btnHistorical.classList.add('text-stone-500');
+                btnAlternative.classList.remove('text-stone-500');
+                btnAlternative.classList.add('text-alternative');
+            }
+            updateDetailsView();
+        }
+
+        function updateBattleView() {
+            const battle = battles.find(b => b.id === currentBattleId);
+            
+            // Update Header Area
+            battleContent.innerHTML = `
+                <div class="flex items-center space-x-3 mb-4 fade-in">
+                    <span class="text-4xl">${battle.icon}</span>
+                    <h3 class="text-2xl font-bold text-stone-800">${battle.name}</h3>
+                </div>
+                <p class="text-stone-600 mb-6 leading-relaxed fade-in">${battle.summary}</p>
+                <div class="bg-stone-100 border-l-4 border-stone-400 p-4 rounded r-1 fade-in">
+                    <h4 class="text-sm font-bold text-stone-500 uppercase tracking-wider mb-1">運命の分かれ目</h4>
+                    <p class="text-lg font-serif text-stone-800 font-bold">${battle.divergence}</p>
+                </div>
+            `;
+
+            // Reset Toggle UI
+            setToggle(true); 
+        }
+
+        function updateDetailsView() {
+            const battle = battles.find(b => b.id === currentBattleId);
+            const data = isHistoricalMode ? battle.fact : battle.alternative;
+            
+            // Style setup based on mode
+            const bgColor = isHistoricalMode ? 'bg-stone-800' : 'bg-indigo-900';
+            const accentColor = isHistoricalMode ? 'text-red-400' : 'text-indigo-300';
+            const tagText = isHistoricalMode ? '史実の結末' : 'IFの可能性';
+
+            scenarioDetails.className = `p-6 md:p-8 text-stone-100 min-h-[250px] transition-colors duration-500 ${bgColor}`;
+            
+            scenarioDetails.innerHTML = `
+                <div class="fade-in h-full flex flex-col justify-center">
+                    <div class="inline-block px-3 py-1 bg-black bg-opacity-30 rounded text-xs font-bold uppercase tracking-widest ${accentColor} mb-4 w-max">
+                        ${tagText}
+                    </div>
+                    <h4 class="text-2xl font-bold mb-4">${data.title}</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h5 class="text-sm text-stone-400 mb-2 border-b border-stone-600 pb-1">決断・行動</h5>
+                            <p class="leading-relaxed text-stone-200">${data.desc}</p>
+                        </div>
+                        <div>
+                            <h5 class="text-sm text-stone-400 mb-2 border-b border-stone-600 pb-1">戦局への影響</h5>
+                            <p class="leading-relaxed text-stone-100 font-medium">${data.impact}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Run init on load
+        window.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>
